@@ -1,0 +1,25 @@
+# Gerenciado por zsh-professional.
+# Histórico local novo. Não importar automaticamente o histórico anterior.
+auto_sync = false
+update_check = false
+store_failed = true
+enter_accept = false
+secrets_filter = true
+search_mode = "fuzzy"
+
+# Filtros adicionais usando regex Rust.
+history_filter = [
+  "(?i)^(export|setenv)[[:space:]].*(password|passwd|token|secret|api[_-]?key|private[_-]?key)=",
+  "(?i)(--password|--token|--api-key|--secret)(=|[[:space:]])",
+  "(?i)(cat|less|more|bat|head|tail|sed|awk|grep)[[:space:]].*\\.env([[:space:]]|$)",
+  "(?i)^(printenv|env)([[:space:]]|$)",
+  "(?i)(gh auth token|gcloud auth print-access-token|aws configure get|kubectl get secret|vault kv get|op read|pass show|lerd share:token|lerd stripe:login)"
+]
+
+cwd_filter = [
+  "^/home/[^/]+/\\.ssh(/|$)",
+  "^/home/[^/]+/\\.gnupg(/|$)"
+]
+
+[output]
+enabled = false

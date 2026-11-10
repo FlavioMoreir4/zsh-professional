@@ -1,0 +1,84 @@
+# Gerenciado por zsh-professional.
+"$schema" = "https://starship.rs/config-schema.json"
+
+add_newline = false
+command_timeout = 2000
+scan_timeout = 30
+follow_symlinks = false
+
+# Duas linhas: contexto acima, cursor abaixo.
+format = "$directory$git_branch$git_status$fill$php$nodejs$cmd_duration$status$line_break$character"
+right_format = ""
+
+[directory]
+style = "bold cyan"
+truncation_length = 3
+truncate_to_repo = true
+fish_style_pwd_dir_length = 1
+read_only = " 󰌾"
+
+[git_branch]
+symbol = " "
+style = "bold purple"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "bold yellow"
+format = "([$all_status$ahead_behind]($style) )"
+conflicted = "=${count}"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+untracked = "?${count}"
+stashed = "\\$${count}"
+modified = "!${count}"
+staged = "+${count}"
+renamed = "»${count}"
+deleted = "✘${count}"
+
+[fill]
+symbol = " "
+
+[php]
+symbol = " "
+style = "bold blue"
+format = "[$symbol$version]($style) "
+detect_files = ["composer.json", "composer.lock", "artisan"]
+
+[nodejs]
+symbol = " "
+style = "bold green"
+format = "[$symbol$version]($style) "
+detect_files = ["package.json", ".node-version", ".nvmrc"]
+detect_folders = ["node_modules"]
+
+[cmd_duration]
+min_time = 2000
+style = "dimmed white"
+format = "[󱎫 $duration]($style) "
+
+[status]
+disabled = false
+style = "bold red"
+format = "[$symbol$status]($style) "
+symbol = "✖ "
+success_symbol = ""
+not_found_symbol = "command-not-found "
+not_executable_symbol = "not-executable "
+map_symbol = true
+recognize_signal_code = true
+pipestatus = true
+
+[line_break]
+disabled = false
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold yellow)"
+
+[package]
+disabled = true
+
+[os]
+disabled = true
