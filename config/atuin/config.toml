@@ -1,25 +1,27 @@
-# Gerenciado por zsh-professional.
-# Histórico local novo. Não importar automaticamente o histórico anterior.
+# Atuin · histórico local novo, sem import automático e sem sincronização.
 auto_sync = false
 update_check = false
-store_failed = true
 enter_accept = false
-secrets_filter = true
+# secrets_filter = true  # Removed to avoid false sense of security
 search_mode = "fuzzy"
+filter_mode = "global"
+style = "compact"
+inline_height = 18
+show_preview = true
+show_help = true
+workspaces = true
 
-# Filtros adicionais usando regex Rust.
+# Filtros adicionais. São defesa em profundidade, não garantia absoluta.
 history_filter = [
-  "(?i)^(export|setenv)[[:space:]].*(password|passwd|token|secret|api[_-]?key|private[_-]?key)=",
-  "(?i)(--password|--token|--api-key|--secret)(=|[[:space:]])",
-  "(?i)(cat|less|more|bat|head|tail|sed|awk|grep)[[:space:]].*\\.env([[:space:]]|$)",
+  "(?i)^(export|setenv)\\b.*(password|passwd|token|secret|api[_-]?key|private[_-]?key)=",
   "(?i)^(printenv|env)([[:space:]]|$)",
-  "(?i)(gh auth token|gcloud auth print-access-token|aws configure get|kubectl get secret|vault kv get|op read|pass show|lerd share:token|lerd stripe:login)"
+  "(?i)(--password|--token|--api-key|--secret)(=|[[:space:]])",
+  "(?i)\\b(cat|less|more|bat|head|tail|sed|awk|grep)[[:space:]].*\\.env([[:space:]]|$)",
+  "(?i)(gh auth token|gcloud auth print-access-token|aws configure get|kubectl get secret|vault kv get|op read|pass show)",
+  "(?i)^lerd[[:space:]]+(share:token|stripe:login)([[:space:]]|$)"
 ]
 
 cwd_filter = [
   "^/home/[^/]+/\\.ssh(/|$)",
   "^/home/[^/]+/\\.gnupg(/|$)"
 ]
-
-[output]
-enabled = false

@@ -1,36 +1,36 @@
-# Zsh Professional: loader interativo.
-[[ -o interactive ]] || return 0
+# Zsh Professional · Fedora 45
+# Zsh puro, modular, sem Oh My Zsh, zplug ou framework.
 
-typeset -g ZSH_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
+[[ -o interactive ]] || return
 
-# Preparar fpath antes do compinit.
-[[ -r "$ZSH_CONFIG_DIR/conf.d/00-environment.zsh" ]] &&
-  source "$ZSH_CONFIG_DIR/conf.d/00-environment.zsh"
+ZSH_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
+ZSH_MODULE_DIR="$ZSH_CONFIG_DIR/conf.d"
 
-# Extensão pessoal: não é sobrescrita pelo instalador.
-[[ -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
-
-# Ordem explícita, evitando carregamento duplicado.
-typeset -a _zsh_professional_modules
-_zsh_professional_modules=(
-  10-options.zsh
-  20-history.zsh
-  30-completion.zsh
-  40-keybindings.zsh
-  45-autosuggestions.zsh
-  50-fzf.zsh
-  60-atuin.zsh
-  70-zoxide.zsh
-  80-aliases.zsh
-  85-functions.zsh
-  90-starship.zsh
-  99-highlighting.zsh
-)
-
-typeset _zsh_professional_module
-for _zsh_professional_module in "${_zsh_professional_modules[@]}"; do
-  [[ -r "$ZSH_CONFIG_DIR/conf.d/$_zsh_professional_module" ]] &&
-    source "$ZSH_CONFIG_DIR/conf.d/$_zsh_professional_module"
+# Módulos explícitos: arquivos extras na pasta não são executados por acidente.
+for module in \
+  00-environment \
+  10-options \
+  20-history \
+  30-completion \
+  40-keybindings \
+  45-autosuggestions \
+  50-fzf \
+  60-atuin \
+  70-zoxide \
+  80-aliases \
+  85-functions \
+  90-starship
+do
+  module_file="$ZSH_MODULE_DIR/$module.zsh"
+  [[ -r "$module_file" ]] && source "$module_file"
 done
 
-unset _zsh_professional_modules _zsh_professional_module
+# Configuração pessoal fica depois dos padrões para poder sobrescrevê-los.
+# O arquivo é preservado pelo instalador e não faz parte do pacote.
+[[ -r "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
+
+# Deve ser o último plugin: registra wrappers de widgets e syntax highlighting.
+module_file="$ZSH_MODULE_DIR/99-highlighting.zsh"
+[[ -r "$module_file" ]] && source "$module_file"
+
+unset module module_file

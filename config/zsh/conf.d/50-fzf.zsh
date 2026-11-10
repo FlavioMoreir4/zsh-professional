@@ -1,11 +1,4 @@
-# FZF fornece Ctrl+T e Alt+C. Atuin assume Ctrl+R no módulo seguinte.
+# FZF primeiro; Atuin será carregado depois e assumirá Ctrl+R.
 if (( $+commands[fzf] )); then
-  eval "$(fzf --zsh)"
+  source <(fzf --zsh)
 fi
-
-export FZF_DEFAULT_OPTS="
-  --height=40%
-  --layout=reverse
-  --border
-  --info=inline
-"

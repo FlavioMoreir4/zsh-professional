@@ -1,45 +1,25 @@
-# Eza como padrão; /usr/bin/ls continua disponível explicitamente.
+# Eza substitui ls apenas quando instalado.
 if (( $+commands[eza] )); then
-  alias ls='eza --icons=auto'
-  alias l='eza --icons=auto'
-  alias ll='eza -lah --icons=auto --git'
-  alias la='eza -a --icons=auto'
-  alias lt='eza --tree --level=2 --icons=auto'
+  alias ls='eza --group-directories-first'
+  alias l='eza --group-directories-first'
+  alias ll='eza -lah --git --group-directories-first'
+  alias la='eza -a --group-directories-first'
+  alias lt='eza --tree --level=2 --group-directories-first'
 else
-  alias ls='ls --color=auto'
-  alias ll='ls -lah --color=auto'
-  alias la='ls -A --color=auto'
+  alias ll='command ls -lah'
 fi
 
-# Laravel / PHP.
+# Laravel/PHP.
+alias a='php artisan'
 alias art='php artisan'
-alias artisan='php artisan'
-alias pest='./vendor/bin/pest'
-alias pint='./vendor/bin/pint'
-alias stan='./vendor/bin/phpstan'
-
-# Composer.
-alias ci='composer install'
-alias cu='composer update'
-alias cr='composer require'
-alias cda='composer dump-autoload'
-
-# Node / npm.
-alias ni='npm install'
-alias nu='npm update'
-alias nr='npm run'
-alias nd='npm run dev'
-alias nb='npm run build'
+alias pest='vendor/bin/pest'
+alias pint='vendor/bin/pint'
+alias stan='vendor/bin/phpstan analyse'
 
 # Git.
-alias gs='git status'
-alias ga='git add'
-alias gc='git commit'
-alias gp='git push'
+alias gs='git status --short --branch'
 alias gd='git diff'
-alias gl='git log --oneline --graph --decorate'
-
-# Navegação.
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
+alias gl='git log --oneline --decorate -12'
+alias gp='git pull --ff-only'
+alias gco='git checkout'
+alias gsw='git switch'

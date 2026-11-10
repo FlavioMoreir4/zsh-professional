@@ -1,3 +1,2 @@
-if (( $+commands[starship] )); then
-  eval "$(starship init zsh)"
-fi
+# Prompt Starship em duas linhas.
+(( $+commands[starship] )) && eval "$(starship init zsh)"

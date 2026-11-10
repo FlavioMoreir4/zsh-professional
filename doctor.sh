@@ -1,56 +1,90 @@
 #!/usr/bin/env bash
 set -uo pipefail
-HOME_DIR="${HOME:?HOME não definido}"
-CONFIG_DIR="$HOME_DIR/.config/zsh"
 
-pass() { printf '[OK] %s\n' "$*"; }
-warn() { printf '[AVISO] %s\n' "$*"; }
-fail() { printf '[FALHA] %s\n' "$*"; }
+FAIL=0
+ok()   { printf '  [OK]   %s\n' "$1"; }
+warn() { printf '  [AVISO] %s\n' "$1"; }
+bad()  { printf '  [ERRO] %s\n' "$1"; FAIL=1; }
 
-echo "========== ZSH PROFESSIONAL DOCTOR =========="
-if command -v zsh >/dev/null 2>&1; then pass "$(zsh --version)"; else fail "Zsh não encontrado"; fi
+echo "Zsh Professional · diagnóstico"
+if [[ -r /etc/fedora-release ]]; then
+  ok "$(cat /etc/fedora-release)"
+else
+  warn "Fedora release não detectado"
+fi
 
-for cmd in atuin fzf zoxide eza starship; do
-  if command -v "$cmd" >/dev/null 2>&1; then pass "$cmd: $(command -v "$cmd")"; else warn "$cmd não encontrado"; fi
+for command_name in zsh atuin fzf zoxide eza starship lerd; do
+  if command -v "$command_name" >/dev/null 2>&1; then
+    printf '  [OK]   %-12s %s\n' "$command_name" "$(command -v "$command_name")"
+  else
+    warn "$command_name não encontrado"
+  fi
+done
+
+for file in \
+  "$HOME/.zshenv" \
+  "$HOME/.zshrc" \
+  "$HOME/.config/atuin/config.toml" \
+  "$HOME/.config/starship.toml"
+do
+  [[ -r "$file" ]] && ok "$file" || warn "arquivo ausente: $file"
+done
+
+if command -v zsh >/dev/null 2>&1; then
+  while IFS= read -r -d '' file; do
+    if zsh -n "$file" >/dev/null 2>&1; then
+      ok "sintaxe: ${file#"$HOME"/}"
+    else
+      bad "sintaxe inválida: $file"
+      zsh -n "$file"
+    fi
+  done < <(
+    find "$HOME/.config/zsh/conf.d" -type f -name '*.zsh' -print0 2>/dev/null
+  )
+
+  if zsh -n "$HOME/.zshenv" >/dev/null 2>&1; then
+    ok "sintaxe: .zshenv"
+  else
+    bad "sintaxe inválida: .zshenv"
+    zsh -n "$HOME/.zshenv"
+  fi
+
+  if zsh -n "$HOME/.zshrc" >/dev/null 2>&1; then
+    ok "sintaxe: .zshrc"
+  else
+    bad "sintaxe inválida: .zshrc"
+    zsh -n "$HOME/.zshrc"
+  fi
+
+  expected="$HOME/.local/share/lerd/bin"
+  actual="$(zsh -fc 'print -r -- "$path[1]"' 2>/dev/null || true)"
+  if [[ -d "$expected" && "$actual" == "$expected" ]]; then
+    ok "Lerd é a primeira entrada do PATH"
+  elif [[ -d "$expected" ]]; then
+    warn "Lerd não é a primeira entrada do PATH (atual: ${actual:-indisponível})"
+  else
+    warn "shims do Lerd não encontrados em $expected"
+  fi
+
+fi
+
+if command -v atuin >/dev/null 2>&1; then
+  if atuin doctor >/dev/null 2>&1; then
+    ok "Atuin doctor"
+  else
+    warn "Atuin doctor reportou pendências; execute atuin doctor para detalhes"
+  fi
+fi
+
+for completion in _lerd _openchamber _copilot; do
+  if [[ -r "$HOME/.local/share/zsh/site-functions/$completion" ]]; then
+    ok "completion preservada: $completion"
+  fi
 done
 
 echo
-echo "========== SINTAXE ZSH =========="
-if command -v zsh >/dev/null 2>&1; then
-  syntax_ok=1
-  for file in "$HOME_DIR/.zshenv" "$HOME_DIR/.zshrc" "$CONFIG_DIR"/conf.d/*.zsh; do
-    [[ -f "$file" ]] || continue
-    if zsh -n "$file"; then pass "Sintaxe: ${file#$HOME_DIR/}"; else fail "Erro: ${file#$HOME_DIR/}"; syntax_ok=0; fi
-  done
-  (( syntax_ok )) || exit 1
+if (( FAIL )); then
+  echo "Diagnóstico encontrou erros."
+  exit 1
 fi
-
-echo
-echo "========== INTEGRAÇÃO LERD =========="
-if command -v zsh >/dev/null 2>&1; then
-  zsh -ic '
-    print -r -- "php=$(whence -p php)"
-    print -r -- "node=$(whence -p node)"
-    print -r -- "npm=$(whence -p npm)"
-    print -r -- "composer=$(whence -p composer)"
-    print -r -- "lerd=$(whence -p lerd)"
-    if [[ ":$PATH:" == *":$HOME/.config/herd-lite/bin:"* ]]; then
-      print -r -- "herd_lite_in_path=yes"
-    else
-      print -r -- "herd_lite_in_path=no"
-    fi
-    print -r -- "completion_lerd=$([[ -f "$HOME/.local/share/zsh/site-functions/_lerd" ]] && print yes || print no)"
-  ' 2>/dev/null
-fi
-
-echo
-echo "========== ATUIN =========="
-if command -v atuin >/dev/null 2>&1; then
-  atuin config get auto_sync --resolved 2>/dev/null || true
-  atuin config get update_check --resolved 2>/dev/null || true
-  atuin config get secrets_filter --resolved 2>/dev/null || true
-  atuin config get enter_accept --resolved 2>/dev/null || true
-fi
-
-echo
-echo "O diagnóstico não altera o shell padrão."
+echo "Diagnóstico finalizado."
