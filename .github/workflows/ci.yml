@@ -1,0 +1,23 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dependências
+        run: sudo apt-get update && sudo apt-get install -y zsh shellcheck
+      - name: Bash (sintaxe + shellcheck)
+        run: |
+          bash -n install.sh rollback.sh doctor.sh
+          shellcheck -x install.sh rollback.sh doctor.sh
+      - name: Zsh (sintaxe)
+        run: |
+          for f in config/.zshenv config/.zshrc config/zsh/conf.d/*.zsh; do zsh -n "$f"; done
+      - name: TOML
+        run: |
+          python3 - <<'PY'
+          import tomllib
+          for p in ("config/atuin/config.toml", "config/starship.toml"):
+              tomllib.load(open(p, "rb"))
+          PY

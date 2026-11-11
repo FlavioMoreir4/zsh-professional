@@ -2,7 +2,6 @@
 setopt AUTO_CD
 setopt INTERACTIVE_COMMENTS
 setopt NO_BEEP
-setopt EXTENDED_GLOB
 setopt PROMPT_SUBST
 setopt COMPLETE_IN_WORD
 setopt ALWAYS_TO_END
